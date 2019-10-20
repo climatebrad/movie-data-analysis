@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-""" Data cleaning utility for movie project."""
+""" Data cleaning utility for movie project.
+
+USAGE:
+from data_cleaning import *
+dfs = {}
+for table_name in TABLE_FORMATS.keys():
+    dfs[table_name] = df_from_movie_csv(table_name)
+"""
 import pandas as pd
 
 FORMAT_DEFAULTS = {
