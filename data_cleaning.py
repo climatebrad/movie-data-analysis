@@ -82,6 +82,12 @@ def select_max_rows_on_key_column(dframe, max_column, key_column):
                       [max_column].idxmax()               # select index of max numvotes
                       ]
 
+def join_dfs_on_key_col(df_left,df_right,left_key,right_key,index_col):
+    """Join two dataframes on key column, return dataframe with index_col of df_left"""
+    return df_left.reset_index().set_index(left_key) \
+                        .join(df_right.set_index(right_key), how='inner') \
+                        .reset_index().set_index(index_col).rename({'index':left_key}, axis='columns')
+
 def include_col(formats, col):
     """Returns True unless col listed in formats['skip_cols']"""
     if 'skip_cols' not in formats:
