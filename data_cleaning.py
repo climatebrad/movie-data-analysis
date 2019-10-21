@@ -75,6 +75,13 @@ def date_to_year(dframe, date_col):
     dframe['year'] = dframe[date_col].dt.year
     return dframe
 
+def select_max_rows_on_key_column(dframe, max_column, key_column):
+    """Drop rows that match the key_column of another row with greater max_column"""
+    return dframe.loc[dframe.fillna(value={max_column:0}) # fill max_column NaN  \
+                      .groupby(key_column)                # for each key_column \
+                      [max_column].idxmax()               # select index of max numvotes
+                      ]
+
 def include_col(formats, col):
     """Returns True unless col listed in formats['skip_cols']"""
     if 'skip_cols' not in formats:
