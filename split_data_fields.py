@@ -2,7 +2,6 @@
 """Process fields of form 'a,b,c' or 'a|b|c' or '[a,b,c]' into pd.Series / expand into rows"""
 
 import re
-import numpy as np
 import pandas as pd
 from data_cleaning import TABLE_FORMATS
 
@@ -12,8 +11,14 @@ from data_cleaning import TABLE_FORMATS
 
 def split_line(line, sep):
     """Splits string line of form "[a,b,c]" or "['a','b','c']" or "a,b,c" into a list"""
-    if pd.isnull(line): return 
+    if pd.isnull(line): return
     return [st.strip("[']") for st in line.split(sep)]
+
+def multifield_to_list(dframe,split_field, split_on=','):
+    """Interpret string-form list in dframe's split_field as a list object"""
+    return_df = dframe.copy()
+    return_df[split_field] = return_df[split_field].apply(lambda field: split_line(field, split_on))
+    return return_df
 
 def multifield_to_col(dframe, index_col, split_field, split_on=','):
     """Given dataframe df, expands split_field of format "val1,val2,val3" to multiple rows"""
@@ -30,6 +35,16 @@ def multifield_to_col(dframe, index_col, split_field, split_on=','):
                .set_index(index_col) \
                .sort_values(by=[index_col, new_field_name])
 
+def df_split_fields_to_lists(dframe, table_name):
+    """Use TABLE_FORMATS to interpret split_fields found in df defined for table_name as lists"""
+    f_table = TABLE_FORMATS[table_name]
+    return_df = dframe.copy()
+    if 'split_fields' in f_table:
+        split_on = f_table.get('split_on', ',')
+        for split_field in f_table['split_fields']:
+            return_df = multifield_to_list(return_df, split_field, split_on)
+
+    return return_df
 
 def expand_df_split_fields(dframe, table_name):
     """Use TABLE_FORMATS to expand all split_fields found in df defined for table_name"""
