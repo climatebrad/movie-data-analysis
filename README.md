@@ -1,4 +1,23 @@
-# fis-mod1-project
+PROJECT MEMBERS:
+- Brad Johnson
+- Chau Nguyen
+
+GOALS:
+Provide Microsoft with actionable insights on how to start a movie studio.
+1. Provide an overview of the competitive landscape
+2. Provide information on average movie budgets genre
+3. Provide insights on movie-goers most highly rated genres and titles
+4. 
+
+RESPONSIBILITIES:
+Brad:    
+Chau:
+
+FILE SUMMARY:
+1. data_cleaning.py
+2. split_data_fields.py
+
+# To load the datafis-mod1-project
 FIS project one repo
 
 ```
