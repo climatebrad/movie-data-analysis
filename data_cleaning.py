@@ -25,7 +25,7 @@ TABLE_FORMATS = {
     },
     'imdb.title.basics':{
         'index_col':'tconst',
-        'year_field':'start_year'
+        'year_field':'start_year',
         'split_fields':['genres']
     },
     'imdb.title.crew':{
@@ -69,6 +69,11 @@ TABLE_FORMATS = {
         'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross']
     }
 }
+
+def date_to_year(dframe, date_col):
+    """Sets 'year' column for dframe based on date_col"""
+    dframe['year'] = dframe[date_col].dt.year
+    return dframe
 
 def include_col(formats, col):
     """Returns True unless col listed in formats['skip_cols']"""
