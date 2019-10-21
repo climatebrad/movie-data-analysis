@@ -82,6 +82,19 @@ def select_max_rows_on_key_column(dframe, max_column, key_column):
                       [max_column].idxmax()               # select index of max numvotes
                       ]
 
+def filter_df_by_group_col_sum_amount(dframe,filter_col,sum_col,min):
+    """Returns dataframe where the sum of sum_col as grouped by filter_col is greater than min"""
+    return_df = dframe.copy()
+    return return_df[return_df[filter_col].isin(
+                                          list(
+                                               dframe.groupby(filter_col)      \
+                                                 .sum()                        \
+                                                 .query(f'{sum_col} > {min}')  \
+                                                 .index
+                                               )
+                                          )
+                  ]
+
 def join_dfs_on_key_col(df_left,df_right,left_key,right_key,index_col):
     """Join two dataframes on key column, return dataframe with index_col of df_left"""
     return df_left.reset_index().set_index(left_key) \
