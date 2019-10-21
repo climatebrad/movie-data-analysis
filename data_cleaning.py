@@ -16,13 +16,16 @@ FORMAT_DEFAULTS = {
 }
 
 TABLE_FORMATS = {
-    'bom.movie_gross':{},
+    'bom.movie_gross':{
+        'year_field':'year'
+    },
     'imdb.name.basics':{
         'index_col':'nconst',
         'split_fields':['primary_profession', 'known_for_titles']
     },
     'imdb.title.basics':{
         'index_col':'tconst',
+        'year_field':'start_year'
         'split_fields':['genres']
     },
     'imdb.title.crew':{
