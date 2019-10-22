@@ -20,7 +20,8 @@ TABLE_FORMATS = {
     'bom.movie_gross':{
         'year_field':'year',
         'dollar_fields':['domestic_gross','foreign_gross'],
-        'nan_to_zero_fields':['domestic_gross', 'foreign_gross']
+        'nan_to_zero_fields':['domestic_gross', 'foreign_gross'],
+        'year_range':(2010,2018)
     },
     'imdb.name.basics':{
         'index_col':'nconst',
@@ -29,7 +30,6 @@ TABLE_FORMATS = {
     },
     'imdb.title.basics':{
         'index_col':'tconst',
-        'year_field':'start_year',
         'split_fields':['genres']
     },
     'imdb.title.crew':{
@@ -70,7 +70,9 @@ TABLE_FORMATS = {
     'tn.movie_budgets':{
         'index_col':'id',
         'date_fields':['release_date'],
-        'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross']
+        'date_to_year':'release_date',
+        'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross'],
+        'year_range':(2010,2018)
     }
 }
 
@@ -150,7 +152,6 @@ def set_read_args(fname):
         for dollar_field in f_table['dollar_fields']:
             converters[dollar_field] = convert_dollars_to_no
     read_args['converters'] = converters
-
     return read_args
 
 def set_gz_fpath(fname, rootdir):
@@ -159,6 +160,23 @@ def set_gz_fpath(fname, rootdir):
     if fname in TABLE_FORMATS:
         suffix = TABLE_FORMATS[fname].get('suffix', suffix)
     return rootdir + fname + '.' + suffix + '.gz'
+
+def filter_to_year_range(dframe,year_range,year_col='year'):
+    """Filter DataFrame dframe to year_range (inclusive) in year_col"""
+    q_string = f"{year_range[0]} <= {year_col} <= {year_range[1]}"
+    return dframe.query(q_string)
+
+def clean_df(dframe, args):
+    """Do additional parsing and cleaning on dframe based on args"""
+    if 'date_to_year' in args:
+        dframe = date_to_year(dframe, args['date_to_year'])
+    if 'year_range' in args:
+        dframe = filter_to_year_range(dframe, args['year_range'])
+    return dframe
+
+def clean_movie_df(movie_df, fname):
+    """Do additional parsing and cleaning on movie_df based on TABLE_FORMATS[fname]."""
+    return clean_df(movie_df, TABLE_FORMATS[fname])
 
 def df_from_movie_csv(fname, rootdir='data/'):
     """Given fname and rootdir of csv, returns cleaned DataFrame"""
