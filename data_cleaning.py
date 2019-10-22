@@ -26,11 +26,12 @@ TABLE_FORMATS = {
     'imdb.name.basics':{
         'index_col':'nconst',
         'split_fields':['primary_profession', 'known_for_titles'],
-        'nan_to_zero_fields':['numvotes']
+        'nan_to_zero_fields':['numvotes'],
     },
     'imdb.title.basics':{
         'index_col':'tconst',
-        'split_fields':['genres']
+        'split_fields':['genres'],
+        'rename_fields':{'primary_title':'title'}
     },
     'imdb.title.crew':{
         'index_col':'tconst',
@@ -72,7 +73,8 @@ TABLE_FORMATS = {
         'date_fields':['release_date'],
         'date_to_year':'release_date',
         'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross'],
-        'year_range':(2010,2018)
+        'year_range':(2010,2018),
+        'rename_fields':{'movie':'title'}
     }
 }
 
@@ -80,6 +82,12 @@ def date_to_year(dframe, date_col):
     """Sets 'year' column for dframe based on date_col"""
     dframe['year'] = dframe[date_col].dt.year
     return dframe
+
+
+def filter_to_year_range(dframe,year_range,year_col='year'):
+    """Filter DataFrame dframe to year_range (inclusive) in year_col"""
+    q_string = f"{year_range[0]} <= {year_col} <= {year_range[1]}"
+    return dframe.query(q_string)
 
 def select_max_rows_on_key_column(dframe, max_column, key_column):
     """Drop rows that match the key_column of another row with greater max_column"""
@@ -161,10 +169,9 @@ def set_gz_fpath(fname, rootdir):
         suffix = TABLE_FORMATS[fname].get('suffix', suffix)
     return rootdir + fname + '.' + suffix + '.gz'
 
-def filter_to_year_range(dframe,year_range,year_col='year'):
-    """Filter DataFrame dframe to year_range (inclusive) in year_col"""
-    q_string = f"{year_range[0]} <= {year_col} <= {year_range[1]}"
-    return dframe.query(q_string)
+def rename_df_fields(dframe, fields_to_change):
+    """Given dict fields_to_change, renames fields in dframe and returns dframe."""
+    return dframe.rename(columns=fields_to_change)
 
 def clean_df(dframe, args):
     """Do additional parsing and cleaning on dframe based on args"""
@@ -172,6 +179,8 @@ def clean_df(dframe, args):
         dframe = date_to_year(dframe, args['date_to_year'])
     if 'year_range' in args:
         dframe = filter_to_year_range(dframe, args['year_range'])
+    if 'rename_fields' in args:
+        dframe = rename_df_fields(dframe,args['rename_fields'])
     return dframe
 
 def clean_movie_df(movie_df, fname):
@@ -179,7 +188,7 @@ def clean_movie_df(movie_df, fname):
     return clean_df(movie_df, TABLE_FORMATS[fname])
 
 def df_from_movie_csv(fname, rootdir='data/'):
-    """Given fname and rootdir of csv, returns cleaned DataFrame"""
+    """Given fname and rootdir of csv (default='data/'), returns cleaned DataFrame"""
     read_args = set_read_args(fname)
     fpath = set_gz_fpath(fname, rootdir)
     movie_df = pd.read_csv(fpath, **read_args)
