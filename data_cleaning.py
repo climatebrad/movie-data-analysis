@@ -8,6 +8,7 @@ for table_name in TABLE_FORMATS.keys():
     dfs[table_name] = df_from_movie_csv(table_name)
 """
 import pandas as pd
+import numpy as np
 
 FORMAT_DEFAULTS = {
     'suffix':'csv',
@@ -18,11 +19,13 @@ FORMAT_DEFAULTS = {
 TABLE_FORMATS = {
     'bom.movie_gross':{
         'year_field':'year',
-        'nan_to_zero_fields':['domestic_gross','foreign_gross']
+        'dollar_fields':['domestic_gross','foreign_gross'],
+        'nan_to_zero_fields':['domestic_gross', 'foreign_gross']
     },
     'imdb.name.basics':{
         'index_col':'nconst',
-        'split_fields':['primary_profession', 'known_for_titles']
+        'split_fields':['primary_profession', 'known_for_titles'],
+        'nan_to_zero_fields':['numvotes']
     },
     'imdb.title.basics':{
         'index_col':'tconst',
@@ -112,8 +115,11 @@ def include_col(formats, col):
     return col not in set(formats['skip_cols'])
 
 def convert_dollars_to_no(dollars):
-    """Converts string in $12, 345.67 format to 12345.67 float"""
-    return float(dollars.replace('$', '').replace(',', ''))
+    """Converts NaN and blank to 0, string in $12, 345.67 format to 12345.67 float"""
+    if pd.isna(dollars) or dollars == '':
+        return 0.0
+    else:
+        return float(dollars.replace('$', '').replace(',', ''))
 
 def set_read_args(fname):
     """Sets arguments for pd.read_csv() based on FORMAT_DEFAULTS and TABLE_FORMATS"""
@@ -144,7 +150,7 @@ def set_read_args(fname):
         for dollar_field in f_table['dollar_fields']:
             converters[dollar_field] = convert_dollars_to_no
     read_args['converters'] = converters
-    
+
     return read_args
 
 def set_gz_fpath(fname, rootdir):
