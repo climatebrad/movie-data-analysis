@@ -176,6 +176,12 @@ def rename_df_fields(dframe, fields_to_change):
     """Given dict fields_to_change, renames fields in dframe and returns dframe."""
     return dframe.rename(columns=fields_to_change)
 
+def normalize_df_fields(dframe, fields_to_change, divide_by=1):
+    """Divide list of fields_to_change in dframe by divide_by. Returns normalized dframe."""
+    return_df = dframe.copy()
+    return_df[fields_to_change] = return_df[fields_to_change] / divide_by
+    return return_df
+
 def clean_df(dframe, args):
     """Do additional parsing and cleaning on dframe based on args"""
     if 'date_to_year' in args:
@@ -184,6 +190,9 @@ def clean_df(dframe, args):
         dframe = filter_to_year_range(dframe, args['year_range'])
     if 'rename_fields' in args:
         dframe = rename_df_fields(dframe,args['rename_fields'])
+    if 'normalize_fields' in args:
+        normalize_by = args.get('normalize_by',FORMAT_DEFAULTS['normalize_by'])
+        dframe = normalize_df_fields(dframe,args['normalize_fields'],normalize_by)
     return dframe
 
 def clean_movie_df(movie_df, fname):
