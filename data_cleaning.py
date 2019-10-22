@@ -13,7 +13,8 @@ import numpy as np
 FORMAT_DEFAULTS = {
     'suffix':'csv',
     'sep':',',
-    'encoding':'utf8'
+    'encoding':'utf8',
+    'normalize_by':1_000_000
 }
 
 TABLE_FORMATS = {
@@ -21,7 +22,8 @@ TABLE_FORMATS = {
         'year_field':'year',
         'dollar_fields':['domestic_gross','foreign_gross'],
         'nan_to_zero_fields':['domestic_gross', 'foreign_gross'],
-        'year_range':(2010,2018)
+        'year_range':(2010,2018),
+        'normalize_fields':['domestic_gross', 'foreign_gross']
     },
     'imdb.name.basics':{
         'index_col':'nconst',
@@ -74,7 +76,8 @@ TABLE_FORMATS = {
         'date_to_year':'release_date',
         'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross'],
         'year_range':(2010,2018),
-        'rename_fields':{'movie':'title'}
+        'rename_fields':{'movie':'title'},
+        'normalize_fields':['production_budget', 'domestic_gross', 'worldwide_gross']
     }
 }
 
@@ -109,13 +112,13 @@ def filter_df_by_group_col_sum_amount(dframe,filter_col,sum_col,min):
                                           )
                   ]
 
-def join_dfs_on_key_col(df_left,df_right,left_on,right_on):
-    """Join two dataframes on key columns, return dataframe with original index of df_left"""
+def join_dfs_on_key_col(df_left,df_right,**kwargs):
+    """Join two dataframes on key columns, return dataframe with original index of df_left."""
     index_col = df_left.index.name
     return df_left.reset_index()                                      \
-                  .merge(df_right.rename(columns={right_on:left_on}),
+                  .merge(df_right,
                          how='inner',
-                         on=left_on)                                  \
+                         **kwargs)                                  \
                   .set_index(index_col)
 
 def include_col(formats, col):
