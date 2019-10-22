@@ -18,7 +18,7 @@ def generate_movie_analysis_df(rootdir='data/'):
     import_tables = ['imdb.title.basics', 'imdb.title.ratings', 'bom.movie_gross', 'tn.movie_budgets']
     dfs = {}
     for table_name in import_tables:
-        dfs[table_name] = df_from_movie_csv(table_name,rootdir)
+        dfs[table_name] = df_from_movie_csv(table_name, rootdir)
 
     # clean dataframes
     print('Cleaning data...')
