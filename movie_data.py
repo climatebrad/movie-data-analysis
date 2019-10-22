@@ -18,7 +18,7 @@ def generate_movie_analysis_df(rootdir='data/'):
     import_tables = ['imdb.title.basics', 'imdb.title.ratings', 'bom.movie_gross', 'tn.movie_budgets']
     dfs = {}
     for table_name in import_tables:
-        dfs[table_name] = df_from_movie_csv(table_name)
+        dfs[table_name] = df_from_movie_csv(table_name,rootdir)
 
     # clean dataframes
     print('Cleaning data...')
@@ -28,6 +28,9 @@ def generate_movie_analysis_df(rootdir='data/'):
     # merge imdb dataframes
     print('Merging IMDB data...')
     imdb_title_ratings_df = dfs['imdb.title.basics'].join(dfs['imdb.title.ratings'])
+
+    # drop duplicates
+    print('Deduping IMDB data...')
     imdb_title_ratings_df = select_max_rows_on_key_column(imdb_title_ratings_df,
                                                          key_column='title',
                                                          max_column='numvotes')
