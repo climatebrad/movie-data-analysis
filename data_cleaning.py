@@ -16,16 +16,13 @@ FORMAT_DEFAULTS = {
 }
 
 TABLE_FORMATS = {
-    'bom.movie_gross':{
-        'year_field':'year'
-    },
+    'bom.movie_gross':{},
     'imdb.name.basics':{
         'index_col':'nconst',
         'split_fields':['primary_profession', 'known_for_titles']
     },
     'imdb.title.basics':{
         'index_col':'tconst',
-        'year_field':'start_year',
         'split_fields':['genres']
     },
     'imdb.title.crew':{
@@ -69,11 +66,6 @@ TABLE_FORMATS = {
         'dollar_fields':['production_budget', 'domestic_gross', 'worldwide_gross']
     }
 }
-
-def date_to_year(dframe, date_col):
-    """Sets 'year' column for dframe based on date_col"""
-    dframe['year'] = dframe[date_col].dt.year
-    return dframe
 
 def include_col(formats, col):
     """Returns True unless col listed in formats['skip_cols']"""
