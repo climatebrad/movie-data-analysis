@@ -17,7 +17,8 @@ FORMAT_DEFAULTS = {
 
 TABLE_FORMATS = {
     'bom.movie_gross':{
-        'year_field':'year'
+        'year_field':'year',
+        'nan_to_zero_fields':['domestic_gross','foreign_gross']
     },
     'imdb.name.basics':{
         'index_col':'nconst',
@@ -95,11 +96,14 @@ def filter_df_by_group_col_sum_amount(dframe,filter_col,sum_col,min):
                                           )
                   ]
 
-def join_dfs_on_key_col(df_left,df_right,left_key,right_key,index_col):
-    """Join two dataframes on key column, return dataframe with index_col of df_left"""
-    return df_left.reset_index().set_index(left_key) \
-                        .join(df_right.set_index(right_key), how='inner') \
-                        .reset_index().set_index(index_col).rename({'index':left_key}, axis='columns')
+def join_dfs_on_key_col(df_left,df_right,left_on,right_on):
+    """Join two dataframes on key columns, return dataframe with original index of df_left"""
+    index_col = df_left.index.name
+    return df_left.reset_index()                                      \
+                  .merge(df_right.rename(columns={right_on:left_on}),
+                         how='inner',
+                         on=left_on)                                  \
+                  .set_index(index_col)
 
 def include_col(formats, col):
     """Returns True unless col listed in formats['skip_cols']"""
@@ -140,7 +144,7 @@ def set_read_args(fname):
         for dollar_field in f_table['dollar_fields']:
             converters[dollar_field] = convert_dollars_to_no
     read_args['converters'] = converters
-
+    
     return read_args
 
 def set_gz_fpath(fname, rootdir):
