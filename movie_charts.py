@@ -9,26 +9,34 @@ mc.make_genre_boxplot(expand_df,'roi',value_num=13,
                       ylabel='Genre',
                       formatx_as_percent=True)
 """
-import pandas as pd
 import seaborn as sns
-from data_cleaning import *
 
-def top_genre_list(dframe,field):
-    return dframe[['genre',field]].groupby('genre').median().sort_values(ascending=False,
-                                                   by=field).reset_index()
+def top_genre_list(genre_df, field):
+    """Returns dataframe with genre names, medians of field,
+       and numeric index, in descending order."""
+    return genre_df[['genre', field]].groupby('genre').median().sort_values(ascending=False,
+                                                                            by=field).reset_index()
 
-def make_genre_boxplot(data,x,value_num=5,highlight_list=[],**kwargs):
-    display = top_genre_list(data, x)
+def make_genre_boxplot(data, field, value_num=5, **kwargs):
+    """Returns seaborn boxplot of top genres vs. field.
+Optional named arguments:
+    highlight_list : list of genres to show in red
+    xlabel : label for x-axis
+    ylabel : label for y-axis
+    formatx_as_percent (bool) : converts x-axis tick marks to percentages"""
+
+    display = top_genre_list(data, field)
     genre_list = display[:value_num].genre.to_list()
     palette = ['gray']*value_num
+    highlight_list = kwargs.get('highlight_list', [])
     for i in display[display.genre.isin(highlight_list)].index:
-        palette[i]='red'
+        palette[i] = 'red'
     splot = sns.boxplot(data=data[data['genre'].isin(genre_list)],
-                           x=x,
-                           y='genre',
-                           palette=palette,
-                           order=genre_list,
-                           showfliers=False)
+                        x=field,
+                        y='genre',
+                        palette=palette,
+                        order=genre_list,
+                        showfliers=False)
     if 'xlabel' in kwargs:
         splot.set_xlabel(kwargs['xlabel'], fontsize=20)
     if 'ylabel' in kwargs:
