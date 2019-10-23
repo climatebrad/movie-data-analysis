@@ -69,7 +69,13 @@ Arguments:
 
         # create profit and roi columns
         print('Calculating profit and ROI')
-        dframe['profit'] = dframe.worldwide_gross - dframe.production_budget
-        dframe['roi'] = dframe.profit / dframe.production_budget
+        if ('worldwide_gross' not in dframe) \
+            and ('domestic_gross' in dframe) \
+            and ('foreign_gross' in dframe):
+                dframe['worldwide_gross'] = dframe.domestic_gross + dframe.foreign_gross
+        if 'worldwide_gross' in dframe:
+            dframe['profit'] = dframe.worldwide_gross - dframe.production_budget
+        if 'profit' in dframe:
+            dframe['roi'] = dframe.profit / dframe.production_budget
 
     return dframe
