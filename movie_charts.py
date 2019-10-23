@@ -12,9 +12,9 @@ mc.make_genre_boxplot(expand_df,'roi',value_num=13,
 import seaborn as sns
 
 def top_genre_list(genre_df, field):
-    """Returns dataframe with genre names, medians of field,
+    """Returns dataframe with genre names, 3rd quartile of field,
        and numeric index, in descending order."""
-    return genre_df[['genre', field]].groupby('genre').median().sort_values(ascending=False,
+    return genre_df[['genre', field]].groupby('genre').quantile(.75).sort_values(ascending=False,
                                                                             by=field).reset_index()
 
 def make_genre_boxplot(data, field, value_num=5, **kwargs):
@@ -25,6 +25,7 @@ Optional named arguments:
     ylabel : label for y-axis
     formatx_as_percent (bool) : converts x-axis tick marks to percentages"""
 
+    showfliers = kwargs.get('showfliers',False)
     display = top_genre_list(data, field)
     genre_list = display[:value_num].genre.to_list()
     palette = ['gray']*value_num
@@ -36,7 +37,7 @@ Optional named arguments:
                         y='genre',
                         palette=palette,
                         order=genre_list,
-                        showfliers=False)
+                        showfliers=showfliers)
     if 'xlabel' in kwargs:
         splot.set_xlabel(kwargs['xlabel'], fontsize=20)
     if 'ylabel' in kwargs:
