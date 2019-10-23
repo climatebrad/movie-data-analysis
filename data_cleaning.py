@@ -182,6 +182,10 @@ def normalize_df_fields(dframe, fields_to_change, divide_by=1):
     return_df[fields_to_change] = return_df[fields_to_change] / divide_by
     return return_df
 
+def filter_df_by_field_count(dframe, field, count):
+    """Return dataframe filtered on field with at least count records per field value."""
+    return dframe[dframe[field].isin(dframe[field].value_counts()[lambda ct: ct >= 100].index)]
+
 def clean_df(dframe, args):
     """Do additional parsing and cleaning on dframe based on args"""
     if 'date_to_year' in args:
