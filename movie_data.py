@@ -14,8 +14,12 @@ def generate_movie_analysis_df(rootdir='data/',sources=['tn']):
     """Do the full set of commands to generate our clean dataframe.
 Arguments:
     rootdir : where the csv.gz files live (default = 'data/')
-    sources : list of sources in addition to IMDB data to use,
-              can be 'tn', 'bom' (default = ['tn']"""
+    sources : list of sources in addition to IMDB data to join with,
+              can be:
+               ['tn'] for The Numbers,
+               ['bom'] for BoxOfficeMojo
+               ['tn','bom'] for both.
+               Default behavior is to only load The Numbers."""
 
     # import tables into dataframes
     print('Importing tables into dataframes...')
