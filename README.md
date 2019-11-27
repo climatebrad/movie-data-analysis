@@ -1,6 +1,6 @@
 PROJECT MEMBERS:
-- Brad Johnson
-- Chau Nguyen
+- [Brad Johnson](https://github.com/climatebrad)
+- [Chau Nguyen](https://github.com/chaugnguyen)
 
 GOALS:
 Provide Microsoft with actionable insights on how to start a movie studio.
